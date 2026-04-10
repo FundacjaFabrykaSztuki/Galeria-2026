@@ -5,7 +5,6 @@
     <title>Speaking Concerts: Cicha Noc</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- DM Sans -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 
     <style>
@@ -38,6 +37,8 @@
             cursor: pointer;
             border-radius: 4px;
         }
+
+        /* LIGHTBOX */
         .lightbox {
             position: fixed;
             inset: 0;
@@ -51,6 +52,21 @@
             max-width: 90%;
             max-height: 90%;
         }
+
+        /* STRZAŁKI */
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 40px;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+            padding: 20px;
+        }
+        .arrow.left { left: 10px; }
+        .arrow.right { right: 10px; }
+
         .photo-credit {
             text-align: center;
             margin-top: 10px;
@@ -65,47 +81,100 @@
 <h1>Speaking Concerts: Cicha Noc</h1>
 
 <div class="description">
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.</p>
-    
-    <p>Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet.</p>
+    <p>Proin porttitor, orci nec nonummy molestie, enim est eleifend mi. Duis semper. Pellentesque congue.</p>
 </div>
 
 <div class="gallery">
-<img src="Zdjecie1.jpeg" alt="">
-<img src="Zdjecie2.jpeg" alt="">
-<img src="Zdjecie3.jpeg" alt="">
-<img src="Zdjecie4.jpeg" alt="">
-<img src="Zdjecie5.jpeg" alt="">
-<img src="Zdjecie6.jpeg" alt="">
-<img src="Zdjecie7.jpeg" alt="">
-<img src="Zdjecie8.jpeg" alt="">
-<img src="Zdjecie9.jpeg" alt="">
-<img src="Zdjecie10.jpeg" alt="">
-<img src="Zdjecie11.jpeg" alt="">
-<img src="Zdjecie12.jpeg" alt="">
-<img src="Zdjecie13.jpeg" alt="">
-<img src="Zdjecie14.jpeg" alt="">
-<img src="Zdjecie15.jpeg" alt="">
-<img src="Zdjecie16.jpeg" alt="">
+<img src="Zdjecie1.jpeg">
+<img src="Zdjecie2.jpeg">
+<img src="Zdjecie3.jpeg">
+<img src="Zdjecie4.jpeg">
+<img src="Zdjecie5.jpeg">
+<img src="Zdjecie6.jpeg">
+<img src="Zdjecie7.jpeg">
+<img src="Zdjecie8.jpeg">
+<img src="Zdjecie9.jpeg">
+<img src="Zdjecie10.jpeg">
+<img src="Zdjecie11.jpeg">
+<img src="Zdjecie12.jpeg">
+<img src="Zdjecie13.jpeg">
+<img src="Zdjecie14.jpeg">
+<img src="Zdjecie15.jpeg">
+<img src="Zdjecie16.jpeg">
 </div>
 
 <div class="photo-credit">
     fot. Bartosz Seifert
 </div>
 
-<div class="lightbox" onclick="this.style.display='none'">
+<div class="lightbox" id="lightbox">
+    <span class="arrow left">&#10094;</span>
     <img src="">
+    <span class="arrow right">&#10095;</span>
 </div>
 
 <script>
     const images = document.querySelectorAll('.gallery img');
-    const lightbox = document.querySelector('.lightbox img');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = lightbox.querySelector('img');
+    const leftArrow = document.querySelector('.arrow.left');
+    const rightArrow = document.querySelector('.arrow.right');
 
-    images.forEach(img => {
+    let currentIndex = 0;
+
+    function showImage(index) {
+        currentIndex = index;
+        lightboxImg.src = images[currentIndex].src;
+    }
+
+    images.forEach((img, index) => {
         img.addEventListener('click', () => {
-            lightbox.src = img.src;
-            document.querySelector('.lightbox').style.display = 'flex';
+            lightbox.style.display = 'flex';
+            showImage(index);
         });
+    });
+
+    function nextImage() {
+        currentIndex = (currentIndex + 1) % images.length;
+        showImage(currentIndex);
+    }
+
+    function prevImage() {
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        showImage(currentIndex);
+    }
+
+    rightArrow.onclick = nextImage;
+    leftArrow.onclick = prevImage;
+
+    // klik poza zdjęciem zamyka
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+            lightbox.style.display = 'none';
+        }
+    });
+
+    // klawiatura
+    document.addEventListener('keydown', (e) => {
+        if (lightbox.style.display === 'flex') {
+            if (e.key === 'ArrowRight') nextImage();
+            if (e.key === 'ArrowLeft') prevImage();
+            if (e.key === 'Escape') lightbox.style.display = 'none';
+        }
+    });
+
+    // swipe (mobile)
+    let startX = 0;
+
+    lightbox.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+    });
+
+    lightbox.addEventListener('touchend', e => {
+        let endX = e.changedTouches[0].clientX;
+        if (startX - endX > 50) nextImage();
+        if (endX - startX > 50) prevImage();
     });
 </script>
 
